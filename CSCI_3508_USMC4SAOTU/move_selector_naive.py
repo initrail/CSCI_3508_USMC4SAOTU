@@ -1,13 +1,6 @@
-import random, sys
-import numpy as np
-
-width = 7
-height = 6
-gridRow = np.zeros(shape=(height, width), dtype=int)
-gridCol = np.zeros(shape=(width, height), dtype=int)
+import random
 
 
-# need grid
 def validMoveRow(grid, col):
     '''
     Validates that a column has an available space on the game board by checking
@@ -16,7 +9,6 @@ def validMoveRow(grid, col):
     :return: True if column top row is empty, otherwise False
     '''
     if grid[0][col] == 0:
-        grid[0][col] = 1
         return True
     return False
 
@@ -29,12 +21,11 @@ def validMoveCol(grid, col):
     :return: True if column top row is empty, otherwise False
     '''
     if grid[col][0] == 0:
-        grid[col][0] = 1
         return True
     return False
 
 
-def randMove(grid):
+def randMove(gridObj):
     '''
     Generates a random column number in which to drop a game piece
     :param grid: game board
@@ -42,24 +33,8 @@ def randMove(grid):
     '''
     valid = False
     while not valid:
-        col = int(random.random()*100) % width
-        if validMoveCol(grid, col):
+        col = int(random.random()*100) % gridObj.width
+        if validMoveRow(gridObj.grid, col):
             valid = True
 
     return col
-
-
-
-'''
-for i in range(len(gridRow[0])-1):
-    gridRow[0][i] = 1
-gridRow[0][2] = 0
-print(randMove(gridRow))
-print(gridRow)
-'''
-
-for i in range(width - 1):
-    gridCol[i][0] = 1
-gridCol[2][0] = 0
-sys.stderr.write(str(randMove(gridCol)) + '\n')
-sys.stderr.write(str(gridCol))
