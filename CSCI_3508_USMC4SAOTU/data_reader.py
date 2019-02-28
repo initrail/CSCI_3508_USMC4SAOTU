@@ -6,6 +6,7 @@ class data_reader:
         self.grid = np.zeros((height,), dtype=int)
         self.width = width
         self.height = height
+        self.readGrid()
 
     def readGrid(self):
         with open('test.json') as f:
