@@ -1,6 +1,5 @@
-from data_reader import data_reader as dr
-import move_selector_naive as mv
 import argparse, sys
+import random
 import json
 
 parser = argparse.ArgumentParser(description='Process some integers.')
@@ -18,20 +17,19 @@ sys.stderr.write("player = " + str(player) + " ")
 sys.stderr.write("width = " + str(width) + " ")
 sys.stderr.write("height = " + str(height) + " ")
 
-
 def main():
-    newReader = dr(width, height)
 
     while True:
-        newReader.readGrid()
+        line = sys.stdin.readline()
+
         move = {}
-        move['move'] = mv.randMove(newReader)
+        move['move'] = random.randint(0, 6)
 
-        move = json.dumps(move)
+        x = json.dumps(move)
 
-        sys.stderr.write(move + "\n")
+        sys.stderr.write(x + "\n")
 
-        sys.stdout.write(move + "\n")
+        sys.stdout.write(x + "\n")
 
         sys.stdout.flush()
         sys.stderr.flush()

@@ -33,8 +33,7 @@ def randMove(gridObj):
     '''
     valid = False
     while not valid:
-        col = int(random.random()*100) % gridObj.width
+        col = random.randint(0, gridObj.width - 1)
         if validMoveRow(gridObj.grid, col):
             valid = True
-
     return col
