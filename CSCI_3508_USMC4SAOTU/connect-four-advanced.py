@@ -65,19 +65,20 @@ def check_ways(x, y, grid):
 	rightup = []
 	leftdown = []
 	rightdown = []
+	# down
 	for i in range(y + 1, height):
 		downrow.append(grid[x][i])
-		if i > (y + 1):
-			if pastpiece != grid[x][i]:
+		if i > (y + 1):# If more than one piece has been checked start making sure that they are consecutive
+			if pastpiece != grid[x][i]:# If the past piece is not the same as the3 new piece done checking for consecutive pieces
 				del downrow[-1]
 				break
 		pastpiece = grid[x][i]
 
+	# left
 	for i in range(x - 1, -1, -1):
 		if grid[i][y] != 0:
 			leftrow.append(grid[i][y])
-		elif len(leftrow) == 2 and grid[i][y] == 0:
-			leftrow.append(grid[i][y])
+		else:
 			break
 		if i < (x - 1):
 			if pastpiece != grid[i][y]:
@@ -85,23 +86,21 @@ def check_ways(x, y, grid):
 				break
 		pastpiece = grid[i][y]
 
+	# right
 	for i in range(x + 1, width):
 		if grid[i][y] != 0:
 			rightrow.append(grid[i][y])
-		elif len(rightrow) == 2 and grid[i][y] == 0:
-			rightrow.append(grid[i][y])
+		else:
 			break
 		if i > (x + 1):
 			if pastpiece != grid[i][y]:
-				if grid[i][y] != 0:
-					del rightrow[-1]
-				else:
-					rightrow.append(grid[i][y])
+				del rightrow[-1]
 				break
 		pastpiece = grid[i][y]
 
+	# left and up
 	for i in range(1, 4): # Only need to check for at most three pieces
-		if (y - i) <= 0 or (x - i) <= 0:
+		if (y - i) < 0 or (x - i) < 0:
 			break
 		if grid[x - i][y - i] != 0:
 			leftup.append(grid[x - i][y - i])	
@@ -112,9 +111,10 @@ def check_ways(x, y, grid):
 				del leftup[-1]
 				break
 		pastpiece = grid[x - i][y - i]
-
+	
+	# right and up
 	for i in range(1, 4):
-		if (x + i) >= width or (y - i) <= 0:
+		if (x + i) >= width or (y - i) < 0:
 			break
 		if grid[x + i][y - i] != 0:
 			rightup.append(grid[x + i][y - i])
@@ -126,8 +126,9 @@ def check_ways(x, y, grid):
 				break
 		pastpiece = grid[x + i][y - i]
 
+	# left and down
 	for i in range(1, 4):
-		if (x - i) <= 0 or (y + i) >= height:
+		if (x - i) < 0 or (y + i) >= height:
 			break
 		if grid[x - i][y + i] != 0:
 			leftdown.append(grid[x - i][y + i])
@@ -139,6 +140,7 @@ def check_ways(x, y, grid):
 				break
 		pastpiece = grid[x - i][y + i]
 
+	# right and down
 	for i in range(1, 4):
 		if (x + i) >= width or (y + i) >= height:
 			break
@@ -161,10 +163,10 @@ def check_ways(x, y, grid):
 	#print('leftdown = ' + str(leftdown) + '\n')
 	#print('downrow = ' + str(downrow) + '\n')
 	#print('rightdown = ' + str(rightdown) + '\n')
-	row_weight(x, downrow, [])
-	row_weight(x, leftrow, rightrow)
-	row_weight(x, leftup, rightdown)
-	row_weight(x, leftdown, rightup)
+	row_weight(grid, x, y, downrow, [], 'vert')
+	row_weight(grid, x, y, leftrow, rightrow, 'horiz')
+	row_weight(grid, x, y, leftup, rightdown, 'diagl')
+	row_weight(grid, x, y, leftdown, rightup, 'diagr')
 	del downrow[:]
 	del leftrow[:]
 	del rightrow[:]
@@ -173,37 +175,41 @@ def check_ways(x, y, grid):
 	del leftdown[:]
 	del rightdown[:]
 
-def row_weight(x, row1, row2):
+def row_weight(grid, x, y, row1, row2, dir):
 	if len(row1) == 0:
 		moves[NO_PIECES].append(x)
 	elif len(row1) > 0:
 		if row1[0] == player:
-			if len(row1) >= 3 and row1[len(row1) - 1] != 0:
+			if len(row1) >= 3:
 				moves[THREE_PIECES].append(x)
 			if len(row1) == 2:
 				moves[TWO_PIECES].append(x)
 			if len(row1) == 1:
 				moves[ONE_PIECE].append(x)
-		elif len(row1) == 3 and row1[0] == opponent and row1[len(row1) - 1] != 0:
-			moves[INSTANT_LOSE].append(x)
-		if row1[len(row1)-1] == 0:
-			del row1[-1]
-			moves[UNBOUNDED_HORIZ].append(x)
+		else:
+			if len(row1) >= 3:
+				moves[INSTANT_LOSE].append(x)
+			if dir == 'horiz' and len(row1) == 2:
+				if (x - len(row1) - 1) >= 0:
+					if grid[x - len(row1) - 1][y] == 0:
+						moves[UNBOUNDED_HORIZ].append(x)
 	if len(row2) == 0:
 		moves[NO_PIECES].append(x)
 	elif len(row2) > 0:
 		if row2[0] == player:
-			if len(row2) >= 3 and row2[len(row2) - 1] != 0:
+			if len(row2) >= 3:
 				moves[THREE_PIECES].append(x)
 			if len(row2) == 2:
 				moves[TWO_PIECES].append(x)
 			if len(row2) == 1:
 				moves[ONE_PIECE].append(x)
-		elif len(row2) == 3 and row2[0] == opponent and row2[len(row2) - 1] != 0:
-			moves[INSTANT_LOSE].append(x)
-		if row2[len(row2)-1] == 0:
-			del row2[-1]
-			moves[UNBOUNDED_HORIZ].append(x)
+		else:
+			if len(row2) >= 3:
+				moves[INSTANT_LOSE].append(x)
+			if dir == 'horiz' and len(row2) == 2:
+				if (x + len(row2) + 1) < width:
+					if grid[x + len(row2) + 1][y] == 0:
+						moves[UNBOUNDED_HORIZ].append(x)
 	if len(row1) > 0 and len(row2) > 0:
 		if row1[0] == row2[0]:
 			row1 = row1 + row2
@@ -214,8 +220,9 @@ def row_weight(x, row1, row2):
 					moves[TWO_PIECES].append(x)
 				if len(row1) == 1:
 					moves[ONE_PIECE].append(x)
-			elif len(row1) == 3 and row1[0] == opponent:
-				moves[INSTANT_LOSE].append(x)
+			else:
+				if len(row1) >= 3:
+					moves[INSTANT_LOSE].append(x)
 # Loop reading the state from the driver and writing a random valid move.
 for line in sys.stdin:
 	for i in range(6): # Empty all of the moves per turn
